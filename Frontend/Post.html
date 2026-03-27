@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>post-page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="./Post.css">
+  
+</head>
+  <body class="d-flex justify-content-center align-items-center" style="height:100vh;">
+    <form action="" style="width: 500px;" class="m-auto formDiv" id="postForm"> 
+        <div class="mb-3">
+  <label for="postTittle" class="form-label">PostTitle</label>
+  <input type="text" class="form-control" id="postTitle"  name="postTitle" placeholder="Enter Title Here">
+</div>
+<div class="mb-3">
+  <label for="dayDescription" class="form-label">Describe your Day Dear</label>
+  <textarea class="form-control" id="dayDescription" rows="10" name="postDescription"></textarea>
+</div>
+<button type="submit" class="btn w-100" id="postButton">Post my Day</button>
+    </form>
+    <!-- 3d -->
+     <div class="hero-bg">
+  <canvas id="particles"></canvas>
+  <div class="glow"></div>
+</div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+  
+  
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+    <script>
+  const form = document.getElementById('postForm');
+  form.addEventListener('submit',async(e)=>{
+    e.preventDefault();
+
+  const formData = new URLSearchParams(new FormData(form));
+  const editPost = JSON.parse(localStorage.getItem("editPost"));
+
+if(editPost){
+  document.getElementById("postTitle").value = editPost.postTitle;
+  document.getElementById("dayDescription").value = editPost.postDescription;
+}
+  formData.append('userId',localStorage.getItem('userId'))
+  const url = editPost 
+  ? 'http://localhost:3000/updatepost'
+  : 'http://localhost:3000/newpost';
+
+if(editPost){
+  formData.append('id', editPost.Id);
+}
+  const response = await fetch(url,{
+    method: 'post',
+    headers:{
+      'content-Type' : 'application/x-www-form-urlencoded'
+    },
+    body : formData
+  });
+  console.log(response);
+  const text = await response.text();
+  alert(text);
+
+  if(response.status==200){
+    localStorage.removeItem("editPost");
+    window.location.href="./Feedpage.html";
+  }
+  });
+  
+</script>  
+<!-- 3d -->
+ <script>
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particlesArray = [];
+
+class Particle {
+  constructor(){
+    this.x = Math.random()*canvas.width;
+    this.y = Math.random()*canvas.height;
+    this.size = Math.random()*2;
+    this.speedX = Math.random()*0.5 - 0.25;
+    this.speedY = Math.random()*0.5 - 0.25;
+  }
+
+  update(){
+    this.x += this.speedX;
+    this.y += this.speedY;
+
+    if(this.x<0 || this.x>canvas.width) this.speedX *= -1;
+    if(this.y<0 || this.y>canvas.height) this.speedY *= -1;
+  }
+
+  draw(){
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fill();
+  }
+}
+
+/* CREATE PARTICLES */
+for(let i=0;i<120;i++){
+  particlesArray.push(new Particle());
+}
+
+/* ANIMATE */
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  particlesArray.forEach(p=>{
+    p.update();
+    p.draw();
+  });
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+/* RESIZE FIX */
+window.addEventListener("resize", ()=>{
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+</script>
+</body>
+</html>

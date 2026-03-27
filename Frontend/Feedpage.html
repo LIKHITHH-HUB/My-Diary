@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>posts</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="./Feedpage.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Special+Gothic+Expanded+One&family=Zalando+Sans+Expanded:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">  
+
+</head>
+  <body>
+    <!-- 3d-animate -->
+ <div class="hero-bg">
+  <canvas id="particles"></canvas>
+  <div class="glow"></div>
+</div>
+    <div class="boder border-1 border-dark text-end p-2">
+        <a href="./Login.html" class="btn btn-danger w-15">Log out</a>
+        <a href="./Post.html" class="btn btn-primary w-15">New post</a>
+    </div>
+
+    <div class="allPosts">
+        
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+<script>
+    const userId = localStorage.getItem('userId');
+
+fetch(`http://localhost:3000/getmyposts?userId=${userId}`)
+.then(response => response.json())
+.then(data => {
+  const container = document.querySelector('.allPosts');
+
+  data.forEach(post => {
+    const div = document.createElement('div');
+    div.classList.add('post');
+
+    div.innerHTML = `
+      <h1>${post.postTitle}</h1>
+      <p>${post.postDescription}</p>
+      <button class="btn viewPostButton text-white" onclick='viewPost(${JSON.stringify(post)})'>
+  View Post
+</button>
+    `;
+
+    container.appendChild(div);
+  });
+});
+</script>
+<script>function viewPost(post){
+  localStorage.setItem("selectedPost", JSON.stringify(post));
+  window.location.href = "./Viewpostpage.html";
+}
+</script>
+<!-- 3d -->
+ <script>
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particlesArray = [];
+
+class Particle {
+  constructor(){
+    this.x = Math.random()*canvas.width;
+    this.y = Math.random()*canvas.height;
+    this.size = Math.random()*2;
+    this.speedX = Math.random()*0.5 - 0.25;
+    this.speedY = Math.random()*0.5 - 0.25;
+  }
+
+  update(){
+    this.x += this.speedX;
+    this.y += this.speedY;
+
+    if(this.x<0 || this.x>canvas.width) this.speedX *= -1;
+    if(this.y<0 || this.y>canvas.height) this.speedY *= -1;
+  }
+
+  draw(){
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fill();
+  }
+}
+
+/* CREATE PARTICLES */
+for(let i=0;i<120;i++){
+  particlesArray.push(new Particle());
+}
+
+/* ANIMATE */
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  particlesArray.forEach(p=>{
+    p.update();
+    p.draw();
+  });
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+/* RESIZE FIX */
+window.addEventListener("resize", ()=>{
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+</script>
+
+</body>
+</html>

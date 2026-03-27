@@ -1,0 +1,125 @@
+#LoginButton{
+    color:white;
+    background-image: linear-gradient(to right,rgb(139,92,246),rgb(14,165,233));
+}
+.login-card{
+    box-shadow: 0px 0px 4px rgba(0,0,0,0.5);
+}
+body{
+    font-family: 'comfortaa';
+    background: rgb(247,255,250);
+}
+/* 3d-animate */
+body{
+    margin:0;
+    font-family:'comfortaa';
+    background:black;
+    color:white;
+    overflow:hidden;
+}
+
+/* HERO SECTION */
+.hero{
+    position:absolute;
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:80px;
+    z-index:1;
+    pointer-events: none;
+}
+
+/* LEFT TEXT */
+.hero-text h1{
+    font-size:80px;
+    letter-spacing:10px;
+    margin-bottom:20px;
+}
+
+.hero-text p{
+    font-size:22px;
+    color:rgba(255,255,255,0.6);
+    line-height:1.6;
+}
+
+/* RIGHT VISUAL */
+.hero-visual{
+    position:relative;
+    width:400px;
+    height:400px;
+}
+
+/* HEART SHAPES */
+.heart{
+    position:absolute;
+    width:150px;
+    height:150px;
+    background: radial-gradient(circle, #ff4d6d, transparent);
+    transform: rotate(45deg);
+    animation: float 6s infinite ease-in-out;
+}
+
+.heart::before,
+.heart::after{
+    content:"";
+    position:absolute;
+    width:150px;
+    height:150px;
+    background: radial-gradient(circle, #ff4d6d, transparent);
+    border-radius:50%;
+}
+
+.heart::before{
+    top:-75px;
+    left:0;
+}
+
+.heart::after{
+    left:-75px;
+    top:0;
+}
+
+/* VARIATIONS */
+.small{
+    width:80px;
+    height:80px;
+    top:50px;
+    left:200px;
+    animation-duration:4s;
+}
+
+.big{
+    width:200px;
+    height:200px;
+    top:150px;
+    left:50px;
+    animation-duration:8s;
+}
+
+/* FLOAT ANIMATION */
+@keyframes float{
+    0%{transform:translateY(0) rotate(45deg);}
+    50%{transform:translateY(-30px) rotate(45deg);}
+    100%{transform:translateY(0) rotate(45deg);}
+}
+
+/* FORM CARD */
+.register-card{
+    position:absolute;
+    bottom:50px;
+    left:50%;
+    transform:translateX(-50%);
+    width:400px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    border-radius:15px;
+    z-index:2;
+}
+
+/* BUTTON */
+#LoginButton{
+    color:white;
+    background:linear-gradient(to right,#ff4d6d,#ff758c);
+}
