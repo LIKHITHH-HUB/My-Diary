@@ -31,7 +31,7 @@
 <script>
     const userId = localStorage.getItem('userId');
 
-fetch(`http://localhost:3000/getmyposts?userId=${userId}`)
+fetch(`https://my-diary-backend-kge5.onrender.com/getmyposts?userId=${userId}`)
 .then(response => response.json())
 .then(data => {
   const container = document.querySelector('.allPosts');

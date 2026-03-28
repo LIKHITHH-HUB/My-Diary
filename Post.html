@@ -46,8 +46,8 @@ if(editPost){
 }
   formData.append('userId',localStorage.getItem('userId'))
   const url = editPost 
-  ? 'http://localhost:3000/updatepost'
-  : 'http://localhost:3000/newpost';
+  ? 'https://my-diary-backend-kge5.onrender.com/updatepost'
+  : 'https://my-diary-backend-kge5.onrender.com/newpost';
 
 if(editPost){
   formData.append('id', editPost.Id);

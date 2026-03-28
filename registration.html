@@ -58,12 +58,13 @@
 
 <script>
   const form = document.getElementById('registrationForm');
-  form.addEventListener('submit',async(e)=>{
-    e.preventDefault();
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
   const formData = new URLSearchParams(new FormData(form));
   
-  const response = await fetch('http://localhost:3000/registerUser',{
+  const response = await fetch('https://my-diary-backend-kge5.onrender.com/registerUser',{
     method: 'post',
     headers:{
       'content-Type' : 'application/x-www-form-urlencoded'
@@ -74,8 +75,7 @@
   if(response.status==200){
     window.location.href="./Login.html";
   }
-
-  });
+});
 </script>
   </body>
 </html>
