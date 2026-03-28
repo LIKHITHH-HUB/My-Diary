@@ -9,13 +9,17 @@ app.use(cors());
 app.use(express.json());
 
 app.use(express.urlencoded({extended: true}));
+const mysql = require('mysql2');
 
-const connection = mysql.createConnection({
+const pool = mysql.createPool({
   host: process.env.MYSQLHOST,
   user: process.env.MYSQLUSER,
   password: process.env.MYSQLPASSWORD,
   database: process.env.MYSQLDATABASE,
-  port: process.env.MYSQLPORT
+  port: process.env.MYSQLPORT,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
 connection.connect((err)=>{
@@ -40,7 +44,7 @@ app.post('/registerUser',async(req,res)=>{
         const hashedpassword = await bcrypt.hash(password,10);
         console.log("Hashed password:",hashedpassword)
 
-    connection.query(
+    pool.query(
     `INSERT INTO Users (EmailId, HashedPassword)
      VALUES (?, ?)`,
     [email, hashedpassword],
@@ -69,7 +73,7 @@ app.post('/userLogin',async(req,res)=>{
 
     let hashedpassword='';
     let userId = '';
-    connection.query(  `select Id,HashedPassword from Users where EmailId='${email}'`,async(err,result)=>{
+    pool.query(  `select Id,HashedPassword from Users where EmailId='${email}'`,async(err,result)=>{
         if(err){
             return res.status(500).send("DB error");
         }
@@ -97,7 +101,7 @@ app.post('/userLogin',async(req,res)=>{
 app.post('/newpost',async(req,res)=>{
 
     const {postTitle,postDescription,userId}=req.body;
-    connection.query(`insert into posts(userId,postTitle,postDescription) values(${userId},"${postTitle}","${postDescription}")`,async(err,response)=>{
+    pool.query(`insert into posts(userId,postTitle,postDescription) values(${userId},"${postTitle}","${postDescription}")`,async(err,response)=>{
         if(err){
             res.status(500).send("error");
             return
@@ -109,7 +113,7 @@ app.post('/newpost',async(req,res)=>{
 
 app.get('/getmyposts',async(req,res)=>{
     console.log(req.query)
-connection.query(`select * from posts where userId=${req.query.userId}`,(err,result)=>{
+pool.query(`select * from posts where userId=${req.query.userId}`,(err,result)=>{
     if(err){
         res.status(500)
         return
@@ -121,7 +125,7 @@ connection.query(`select * from posts where userId=${req.query.userId}`,(err,res
 app.post('/deletepost', (req,res)=>{
   const { id } = req.body;
 
-  connection.query(
+  pool.query(
     'DELETE FROM posts WHERE Id = ?',
     [id],
     (err,result)=>{
@@ -136,7 +140,7 @@ app.post('/deletepost', (req,res)=>{
 app.post('/updatepost',(req,res)=>{
     const {id ,postTitle,postDescription } = req.body;
 
-    connection.query(
+    pool.query(
         'UPDATE posts SET postTitle=?, postDescription=? WHERE ID =?',
         [postTitle,postDescription,id],
         (err,result)=>{
