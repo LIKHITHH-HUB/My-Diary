@@ -11,11 +11,12 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'likith@15',
-    database: 'MyDairy'
-})
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT
+});
 
 connection.connect((err)=>{
     if(err){
