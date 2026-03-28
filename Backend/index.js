@@ -3,14 +3,13 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const mysql = require('mysql2');
 
-const app=express();
+const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(express.urlencoded({extended: true}));
-const mysql = require('mysql2');
-
+//  MySQL Pool (Correct for Render + Railway)for free acesess
 const pool = mysql.createPool({
   host: process.env.MYSQLHOST,
   user: process.env.MYSQLUSER,
@@ -22,140 +21,133 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-connection.connect((err)=>{
-    if(err){
-        console.log('error occured to connecting the database!');
-        return;
-    }
-    console.log('connected to database');
+//  Test route
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'successful' });
 });
 
-app.get('/',(req,res)=>{
-    console.log(req)
-    res.status(200).json({message: 'sucessfull'})
-})
+//  Register User
+app.post('/registerUser', async (req, res) => {
+  const { email, password } = req.body;
 
-app.post('/registerUser',async(req,res)=>{
-    console.log(req.body);
-    const {email,password}=req.body;
-
-    try{
-        // hash the password
-        const hashedpassword = await bcrypt.hash(password,10);
-        console.log("Hashed password:",hashedpassword)
+  try {
+    const hashedpassword = await bcrypt.hash(password, 10);
 
     pool.query(
-    `INSERT INTO Users (EmailId, HashedPassword)
-     VALUES (?, ?)`,
-    [email, hashedpassword],
-    (err, results) => {
-
+      `INSERT INTO Users (EmailId, HashedPassword) VALUES (?, ?)`,
+      [email, hashedpassword],
+      (err, result) => {
         if (err) {
-            console.error(err);
-            return res.status(500).send("Database error");
+          console.error(err);
+          return res.status(500).send("Database error");
         }
+        res.status(200).send("Registered successfully");
+      }
+    );
 
-        return res.status(200).send("okay");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error hashing password");
+  }
+});
+
+// Login User
+app.post('/userLogin', (req, res) => {
+  const { email, password } = req.body;
+
+  pool.query(
+    `SELECT Id, HashedPassword FROM Users WHERE EmailId = ?`,
+    [email],
+    async (err, result) => {
+      if (err) return res.status(500).send("DB error");
+
+      if (result.length === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const hashedpassword = result[0].HashedPassword;
+      const userId = result[0].Id;
+
+      const match = await bcrypt.compare(password, hashedpassword);
+
+      if (match) {
+        res.status(200).json({ userId });
+      } else {
+        res.status(401).send("Invalid password");
+      }
     }
-);
+  );
+});
 
-    }catch (err){
+// Create New Post
+app.post('/newpost', (req, res) => {
+  const { postTitle, postDescription, userId } = req.body;
+
+  pool.query(
+    `INSERT INTO posts (userId, postTitle, postDescription) VALUES (?, ?, ?)`,
+    [userId, postTitle, postDescription],
+    (err, result) => {
+      if (err) {
         console.error(err);
-        res.status(500).send('Error while hashing password');
+        return res.status(500).send("Error creating post");
+      }
+      res.status(200).send("Post created");
     }
-})
+  );
+});
 
-app.post('/userLogin',async(req,res)=>{
-    console.log("user logged in: ",req.body);
-    const{email,password}=req.body;
-    // let hashedpassword = "$2b$10$W81vaO37OEBESS2iiQOMqeDKSOVvn60cBNV9J35Ysk4FMhu.Ynx6i"
-    // let hashedPassword ="asewdffvrfvj"
+//  Get User Posts
+app.get('/getmyposts', (req, res) => {
+  const { userId } = req.query;
 
-    let hashedpassword='';
-    let userId = '';
-    pool.query(  `select Id,HashedPassword from Users where EmailId='${email}'`,async(err,result)=>{
-        if(err){
-            return res.status(500).send("DB error");
-        }
-        if(result.length ===0){
-            return res.status(404).json({
-                message: "user not found"
-            });
-        }
-    hashedpassword=result[0].HashedPassword;
-    userId = result[0].Id;
-    let response= await bcrypt.compare(password,hashedpassword);
-    if(response){
-        res.status(200).json({userId:userId});
-    return
+  pool.query(
+    `SELECT * FROM posts WHERE userId = ?`,
+    [userId],
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error fetching posts");
+      }
+      res.status(200).send(result);
     }
-    else{
-        res.status(500)
-        return
-    }
-    })
-    // console.log('Is same?',response);
-    // res.status(200).send('Matched');
-})
+  );
+});
 
-app.post('/newpost',async(req,res)=>{
-
-    const {postTitle,postDescription,userId}=req.body;
-    pool.query(`insert into posts(userId,postTitle,postDescription) values(${userId},"${postTitle}","${postDescription}")`,async(err,response)=>{
-        if(err){
-            res.status(500).send("error");
-            return
-        }
-        res.status(200).send("post Created");
-    })
-    console.log("New post:", req.body);
-})
-
-app.get('/getmyposts',async(req,res)=>{
-    console.log(req.query)
-pool.query(`select * from posts where userId=${req.query.userId}`,(err,result)=>{
-    if(err){
-        res.status(500)
-        return
-    }
-    res.status(200).send(result);
-})
-})
-
-app.post('/deletepost', (req,res)=>{
+//  Delete Post
+app.post('/deletepost', (req, res) => {
   const { id } = req.body;
 
   pool.query(
-    'DELETE FROM posts WHERE Id = ?',
+    `DELETE FROM posts WHERE Id = ?`,
     [id],
-    (err,result)=>{
-      if(err){
-        return res.status(500).send("Error deleting");
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error deleting post");
       }
       res.status(200).send("Deleted");
     }
   );
 });
 
-app.post('/updatepost',(req,res)=>{
-    const {id ,postTitle,postDescription } = req.body;
+// Update Post
+app.post('/updatepost', (req, res) => {
+  const { id, postTitle, postDescription } = req.body;
 
-    pool.query(
-        'UPDATE posts SET postTitle=?, postDescription=? WHERE ID =?',
-        [postTitle,postDescription,id],
-        (err,result)=>{
-            if(err){
-                return res.status(500).send("Error updating");
-            }
-            res.status(200).send("updated successfully");
-        } 
-    )
+  pool.query(
+    `UPDATE posts SET postTitle = ?, postDescription = ? WHERE Id = ?`,
+    [postTitle, postDescription, id],
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error updating post");
+      }
+      res.status(200).send("Updated successfully");
+    }
+  );
 });
-// app.listen(3000,()=>{
-//     console.log('server started on port 3000!')
-// })
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>{
-    console.log(`server started on port $(PORT)`);
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
 });
