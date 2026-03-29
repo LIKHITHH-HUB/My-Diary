@@ -150,8 +150,9 @@ app.post('/updatepost', (req, res) => {
     }
   );
 });
-
-// database fixing
+pool.query("SHOW TABLES", (err, result) => {
+  console.log("TABLES:", result);
+});
 app.get('/fixdb', (req, res) => {
 
   pool.query(`
