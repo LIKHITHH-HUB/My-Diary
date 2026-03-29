@@ -151,11 +151,43 @@ app.post('/updatepost', (req, res) => {
   );
 });
 
+// database fixing
+app.get('/fixdb', (req, res) => {
+
+  pool.query(`
+    CREATE TABLE IF NOT EXISTS Users(
+      Id INT PRIMARY KEY AUTO_INCREMENT,
+      EmailId VARCHAR(50) UNIQUE,
+      HashedPassword VARCHAR(100)
+    )
+  `, (err) => {
+    if (err) {
+      console.error("Users table error:", err);
+    } else {
+      console.log("Users table ready");
+    }
+  });
+
+  pool.query(`
+    CREATE TABLE IF NOT EXISTS posts(
+      Id INT PRIMARY KEY AUTO_INCREMENT,
+      userId INT,
+      postTitle VARCHAR(100),
+      postDescription VARCHAR(1500)
+    )
+  `, (err) => {
+    if (err) {
+      console.error("Posts table error:", err);
+    } else {
+      console.log("Posts table ready");
+    }
+  });
+
+  res.send("DB FIX DONE");
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
 
-pool.query("SHOW TABLES", (err, result) => {
-  console.log("TABLES:", result);
-});
