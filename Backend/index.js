@@ -155,3 +155,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
+
+pool.query("SHOW TABLES", (err, result) => {
+  console.log("TABLES:", result);
+});
