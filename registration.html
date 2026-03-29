@@ -47,7 +47,7 @@
   <label for="passwordInput" class="form-label">Set Password</label>
   <input type="password" class="form-control" name="password" id="passwordInput">
 </div>
-<p>Already have an account? <a href="index.html"></a>Login Here</p>
+<p>Already have an account? <a href="index.html">Login Here</a></p>
   <button type="submit" class="btn w-100" id="LoginButton">Register</button>
     </form>
     <!-- <a href="#" class="btn w-100" id="LoginButton">Login</a> -->
@@ -73,7 +73,8 @@ form.addEventListener('submit', async (e) => {
   });
 
   if(response.status==200){
-    window.location.href="./Login.html";
+    // window.location.href="./index.html";
+    window.location.href = "https://likhithh-hub.github.io/My-Diary/index.html";
   }
 });
 </script>
