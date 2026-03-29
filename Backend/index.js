@@ -10,16 +10,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //  MySQL Pool (Correct for Render + Railway)for free acesess
+const dbUrl = new URL(process.env.MYSQL_PUBLIC_URL);
+
 const pool = mysql.createPool({
-  host: process.env.MYSQLHOST,
-  user: process.env.MYSQLUSER,
-  password: process.env.MYSQLPASSWORD,
-  database: process.env.MYSQLDATABASE,
-  port: process.env.MYSQLPORT,
+  host: dbUrl.hostname,
+  user: dbUrl.username,
+  password: dbUrl.password,
+  database: dbUrl.pathname.replace("/", ""),
+  port: dbUrl.port,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
+
+
 
 //  Test route
 app.get('/', (req, res) => {
