@@ -121,6 +121,8 @@ app.get('/getmyposts', (req, res) => {
 app.post('/deletepost', (req, res) => {
   const { id } = req.body;
 
+  console.log("DELETE REQUEST ID:", id); // DEBUG
+
   pool.query(
     `DELETE FROM posts WHERE Id = ?`,
     [id],
@@ -129,7 +131,14 @@ app.post('/deletepost', (req, res) => {
         console.error(err);
         return res.status(500).send("Error deleting post");
       }
-      res.status(200).send("Deleted");
+
+      console.log("DELETE RESULT:", result); // DEBUG
+
+      if (result.affectedRows === 0) {
+        return res.status(404).send("Post not found");
+      }
+
+      res.status(200).send("Deleted successfully");
     }
   );
 });
