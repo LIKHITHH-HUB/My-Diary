@@ -1,7 +1,67 @@
-body{
-    background: rgb(247,255,250);
-    
+
+body {
+  background: radial-gradient(circle at top, #1a1a2e, #000);
+  color: white;
+  overflow-x: hidden;
+  font-family : 'Poppins',sans-serif;
+  margin: 0;
 }
+/* 🔥 3D HERO SECTION */
+.hero-3d {
+  height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+  margin: 40px;
+}
+
+.hero-content {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  padding: 60px;
+  border-radius: 20px;
+  text-align: center;
+  transform: rotateX(10deg) rotateY(-10deg);
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.5),
+    inset 0 0 20px rgba(255,255,255,0.2);
+  animation: floatCard 4s ease-in-out infinite;
+}
+
+/* 🔥 TEXT STYLE */
+.hero-content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.hero-content p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* 🔥 FLOAT ANIMATION */
+@keyframes floatCard {
+  0% { transform: rotateX(10deg) rotateY(-10deg) translateY(0); }
+  50% { transform: rotateX(10deg) rotateY(-10deg) translateY(-10px); }
+  100% { transform: rotateX(10deg) rotateY(-10deg) translateY(0); }
+}
+
+/* POSTS */
+.post {
+  background: white;
+  color: black;
+  padding: 15px;
+  margin: 20px;
+  border-radius: 10px;
+}
+
+
+.allPosts {
+  padding: 20px;
+}
+
+
 .allPosts{
     /* border: 1px black solid; */
     padding:20px;
@@ -10,7 +70,9 @@ body{
     display: flex;
     flex-direction: column;
     gap: 20px;
+    display: none;
 }
+
 .post{
     /* border: 2px red solid; */
     background: white;
