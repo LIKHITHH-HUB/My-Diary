@@ -36,7 +36,7 @@
 <script>
    const userId = localStorage.getItem('userId');
 
-fetch(`https://my-diary-backend-kge5.onrender.com/getmyposts?userId=${userId}`)
+fetch(`http://localhost:3000/getmyposts?userId=${userId}`)
 .then(res => res.json())
 .then(data => {
 
@@ -66,7 +66,7 @@ fetch(`https://my-diary-backend-kge5.onrender.com/getmyposts?userId=${userId}`)
 
     <div style="display:flex; gap:10px; margin-top:10px;">
       <button class="btn btn-info text-white" onclick='viewPost(${JSON.stringify(post)})'>
-        View
+        ViewPost
       </button>
 
       <button class="btn btn-warning" onclick='editPost(${JSON.stringify(post)})'>
@@ -92,7 +92,7 @@ function viewPost(post){
 
 function editPost(post){
   localStorage.setItem("editPost", JSON.stringify(post));
-  window.location.href = "https://likhithh-hub.github.io/My-Diary/Post.html";
+  window.location.href = "./Post.html";
 }
 function createNewPost(){
   localStorage.removeItem("editPost");  // CLEAR OLD DATA
@@ -167,7 +167,7 @@ window.addEventListener("resize", ()=>{
   const confirmDelete = confirm("Are you sure to delete?");
   if(!confirmDelete) return;
 
-  const response = await fetch('https://my-diary-backend-kge5.onrender.com/deletepost', {
+  const response = await fetch('http://localhost:3000/deletepost', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

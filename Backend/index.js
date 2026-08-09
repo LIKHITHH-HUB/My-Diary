@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const mysql = require('mysql2');
+require('dotenv').config();
 
 const app = express();
 
@@ -9,20 +10,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//  MySQL Pool (Correct for Render + Railway)for free acesess
-const dbUrl = new URL(process.env.MYSQL_PUBLIC_URL);
-
+// Database connection
+// Database connection
 const pool = mysql.createPool({
-  host: dbUrl.hostname,
-  user: dbUrl.username,
-  password: dbUrl.password,
-  database: dbUrl.pathname.replace("/", ""),
-  port: dbUrl.port,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
-
 
 
 //  Test route
@@ -42,9 +41,14 @@ app.post('/registerUser', async (req, res) => {
       [email, hashedpassword],
       (err, result) => {
         if (err) {
-          console.error(err);
-          return res.status(500).send("Database error");
-        }
+    console.error(err);
+
+    if (err.code === 'ER_DUP_ENTRY') {
+        return res.status(409).send("Email already registered. Please login.");
+    }
+
+    return res.status(500).send("Database error");
+}
         res.status(200).send("Registered successfully");
       }
     );
@@ -159,9 +163,19 @@ app.post('/updatepost', (req, res) => {
     }
   );
 });
-pool.query("SHOW TABLES", (err, result) => {
-  console.log("TABLES:", result);
+
+// pool.query("SHOW TABLES", (err, result) => {
+//   console.log("TABLES:", result);
+// });
+
+pool.query("SELECT 1", (err, result) => {
+  if (err) {
+    console.error("MYSQL CONNECTION ERROR:", err);
+  } else {
+    console.log("MYSQL CONNECTION SUCCESS:", result);
+  }
 });
+
 app.get('/fixdb', (req, res) => {
 
   pool.query(`

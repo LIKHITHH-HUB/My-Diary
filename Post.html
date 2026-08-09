@@ -92,50 +92,93 @@ window.addEventListener("resize", ()=>{
   canvas.height = window.innerHeight;
 });
 </script>
-   <script>
 
-  const form = document.getElementById('postForm');
-  const editPost = JSON.parse(localStorage.getItem("editPost"));
+<script>
 
-if(editPost){
-  document.getElementById("postTitle").value = editPost.postTitle;
-  document.getElementById("dayDescription").value = editPost.postDescription;
+const form = document.getElementById('postForm');
 
-  document.getElementById("postButton").innerText = "Update Post";
+const editPost = JSON.parse(localStorage.getItem("editPost"));
+
+if (editPost) {
+
+    document.getElementById("postTitle").value = editPost.postTitle;
+    document.getElementById("dayDescription").value = editPost.postDescription;
+
+    document.getElementById("postButton").innerText = "Update Post";
 }
-  form.addEventListener('submit', async (e) => {
-  e.preventDefault();
 
-  const formData = new URLSearchParams(new FormData(form));
 
-  formData.append('userId', localStorage.getItem('userId'));
+form.addEventListener('submit', async (e) => {
 
-  const editPost = JSON.parse(localStorage.getItem("editPost"));
+    e.preventDefault();
 
-  let url = 'https://my-diary-backend-kge5.onrender.com/newpost';
+    const formData = new URLSearchParams(new FormData(form));
 
-  if(editPost){
-    url = 'https://my-diary-backend-kge5.onrender.com/updatepost';
-    formData.append('id', editPost.Id);
-  }
+    const userId = localStorage.getItem('userId');
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: formData
-  });
+    formData.append('userId', userId);
 
-  const text = await response.text();
-  alert(text);
+    const editPost = JSON.parse(localStorage.getItem("editPost"));
 
-  localStorage.removeItem("editPost");
+    let url;
 
-  window.location.href = "Feedpage.html";
+    if (editPost) {
+
+        // EDIT EXISTING POST
+        url = 'https://my-diary-backend-kge5.onrender.com/updatepost';
+
+        formData.append('id', editPost.Id);
+
+    } else {
+
+        // CREATE NEW POST
+        url = 'https://my-diary-backend-kge5.onrender.com/newpost';
+
+    }
+
+    console.log("URL:", url);
+    console.log("EDIT POST:", editPost);
+    console.log("FORM DATA:", [...formData]);
+
+    try {
+
+        const response = await fetch(url, {
+            method: 'POST',
+
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+
+            body: formData
+        });
+
+        const text = await response.text();
+
+        console.log("STATUS:", response.status);
+        console.log("SERVER RESPONSE:", text);
+
+        if (!response.ok) {
+            alert("Error: " + text);
+            return;
+        }
+
+        alert(text);
+
+        localStorage.removeItem("editPost");
+
+        window.location.href = "Feedpage.html";
+
+    } catch (error) {
+
+        console.error("FETCH ERROR:", error);
+
+        alert("Unable to connect to server.");
+
+    }
+
 });
 
-</script>  
+</script>
 
 </body>
 </html>

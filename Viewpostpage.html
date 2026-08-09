@@ -54,7 +54,7 @@ async function deletePost(){
   const confirmDelete = confirm("Are you sure");
   if(!confirmDelete) return;
 
-  await fetch(`https://my-diary-backend-kge5.onrender.com/deletepost`,{
+  await fetch(`https://localhost:3000/deletepost`,{
     method:"POST",
     headers:{
       "Content-Type":"application/json"
